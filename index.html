@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Simulateur & Calculette · Capfinances</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#121442">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Simulateur">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#121442;
+    --navy-soft:#1c2059;
+    --beige:#DDC7B6;
+    --gold:#C6A98A;
+    --cream:#F7F3EC;
+    --ink:#1A1A2E;
+    --ink-soft:#5B5A72;
+    --line:#E4DCD0;
+    --gain:#5E7C5A;
+    --loss:#B5654A;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:40px;
+  }
+  header{
+    background:var(--navy);
+    color:var(--cream);
+    padding:28px 20px 22px;
+    border-bottom:3px solid var(--gold);
+  }
+  header .eyebrow{
+    font-size:12.5px;
+    color:var(--beige);
+    letter-spacing:0.02em;
+    margin-bottom:4px;
+  }
+  header h1{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:26px;
+    margin:0;
+    line-height:1.15;
+  }
+  .wrap{
+    max-width:640px;
+    margin:0 auto;
+    padding:0 16px;
+  }
+  nav.tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:18px;
+    padding:4px;
+    background:rgba(0,0,0,0.35)
+  }
+  nav.tabs button{
+    flex:1 1 calc(50% - 6px);
+    padding:10px 6px;
+    border:none;
+    background:transparent;
+    color:var(--beige);
+    font-family:'Inter',sans-serif;
+    font-size:12.5px;
+    font-weight:600;
+    cursor:pointer;
+    border-radius:9px;
+    transition:background .15s ease, color .15s ease;
+  }
+  nav.tabs button.active{
+    background:var(--gold);
+    color:var(--navy);
+  }
+  section.panel{
+    display:none;
+    margin-top:22px;
+  }
+  section.panel.active{display:block;}
+
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px;
+    margin-bottom:16px;
+  }
+  .card h2{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:18px;
+    margin:0 0 14px;
+    color:var(--navy);
+  }
+  .field{
+    margin-bottom:14px;
+  }
+  .field label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:5px;
+  }
+  .field input, .field select{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:9px;
+    font-size:15px;
+    font-family:'Inter',sans-serif;
+    background:var(--cream);
+    color:var(--ink);
+  }
+  .field input:focus, .field select:focus{
+    outline:none;
+    border-color:var(--gold);
+    background:#fff;
+  }
+  .row2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .segbtns{
+    display:flex;
+    gap:8px;
+    margin-bottom:16px;
+  }
+  .segbtns button{
+    flex:1;
+    padding:9px 8px;
+    border:1px solid var(--line);
+    background:var(--cream);
+    color:var(--ink-soft);
+    font-size:13px;
+    font-weight:600;
+    border-radius:9px;
+    cursor:pointer;
+  }
+  .segbtns button.active{
+    background:var(--navy);
+    border-color:var(--navy);
+    color:#fff;
+  }
+  .result{
+    background:var(--navy);
+    color:var(--cream);
+    border-radius:var(--radius);
+    padding:22px 20px;
+    margin-bottom:16px;
+  }
+  .result .label{
+    font-size:12.5px;
+    color:var(--beige);
+    margin-bottom:4px;
+  }
+  .result .headline{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:34px;
+    line-height:1.1;
+    color:#fff;
+  }
+  .result .headline small{
+    font-size:16px;
+    font-weight:400;
+    color:var(--beige);
+    margin-left:4px;
+  }
+  .result .sub{
+    margin-top:14px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+  }
+  .result .sub div{
+    font-size:12.5px;
+    color:var(--beige);
+  }
+  .result .sub div span{
+    display:block;
+    font-size:16px;
+    color:#fff;
+    font-weight:600;
+    margin-top:2px;
+  }
+  .positive{color:#9FD39A !important;}
+  .negative{color:#E8A491 !important;}
+
+  .chart-wrap{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+    margin-bottom:16px;
+  }
+  .chart-wrap h3{
+    font-size:12.5px;
+    text-transform:none;
+    color:var(--ink-soft);
+    margin:0 0 10px;
+    font-weight:600;
+  }
+  .legend{
+    display:flex;
+    gap:16px;
+    margin-top:8px;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .legend span{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+  }
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+
+  .versements{
+    margin-top:4px;
+  }
+  .vrow{
+    display:grid;
+    grid-template-columns:1fr 1fr auto;
+    gap:8px;
+    margin-bottom:8px;
+    align-items:center;
+  }
+  .vrow input{
+    padding:9px 10px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:14px;
+    background:var(--cream);
+  }
+  .vrow button{
+    background:none;
+    border:none;
+    color:var(--loss);
+    font-size:18px;
+    cursor:pointer;
+    padding:4px 8px;
+  }
+  .addbtn{
+    width:100%;
+    padding:10px;
+    border:1.5px dashed var(--line);
+    background:none;
+    border-radius:9px;
+    color:var(--ink-soft);
+    font-size:13.5px;
+    font-weight:600;
+    cursor:pointer;
+    margin-top:4px;
+  }
+  .addbtn:hover{border-color:var(--gold); color:var(--navy);}
+
+  .disclaimer{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    line-height:1.5;
+    padding:12px 14px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    margin-top:4px;
+  }
+  .toggle-adv{
+    background:none;
+    border:none;
+    color:var(--navy);
+    font-size:13px;
+    font-weight:600;
+    text-decoration:underline;
+    cursor:pointer;
+    padding:0;
+    margin-bottom:10px;
+  }
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="eyebrow">CAPFINANCES</div>
+    <h1>Simulateur d'épargne & calculette de rente</h1>
+    <nav class="tabs">
+      <button class="active" data-tab="epargne">Épargne</button>
+      <button data-tab="rente">Rente</button>
+      <button data-tab="revenus">Revenus compl.</button>
+      <button data-tab="renta">Rentabilité</button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ===================== EPARGNE ===================== -->
+  <section class="panel active" id="panel-epargne">
+    <div class="card">
+      <h2>Mode</h2>
+      <div class="segbtns">
+        <button class="active" data-ep-mode="simple">Simulation simple</button>
+        <button data-ep-mode="comparaison">Comparer 2 placements</button>
+      </div>
+    </div>
+
+    <div id="ep-simple-block">
+      <div class="card">
+        <h2>Paramètres du plan</h2>
+        <div class="field">
+          <label>Capital initial (€)</label>
+          <input type="number" id="ep-capital" value="5000" min="0" step="100">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Versement mensuel (€)</label>
+            <input type="number" id="ep-mensuel" value="150" min="0" step="10">
+          </div>
+          <div class="field">
+            <label>Durée (années)</label>
+            <input type="number" id="ep-duree" value="15" min="1" max="60" step="1">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Rendement annuel brut (%)</label>
+            <input type="number" id="ep-taux" value="4.5" min="-10" max="20" step="0.1">
+          </div>
+          <div class="field">
+            <label>Frais annuels sur encours (%)</label>
+            <input type="number" id="ep-frais" value="0.6" min="0" max="5" step="0.1">
+          </div>
+        </div>
+        <div class="field">
+          <label>Frais d'entrée / sur versements (%)</label>
+          <input type="number" id="ep-frais-entree" value="0" min="0" max="10" step="0.1">
+        </div>
+      </div>
+
+      <div class="result">
+        <div class="label">Capital final estimé</div>
+        <div class="headline" id="ep-out-final">—</div>
+        <div class="sub">
+          <div>Total versé <span id="ep-out-verse-net">—</span></div>
+          <div>Frais d'entrée cumulés <span id="ep-out-frais-entree">—</span></div>
+          <div>Plus-value <span id="ep-out-gain">—</span></div>
+          <div>Rendement net <span id="ep-out-net">—</span></div>
+        </div>
+      </div>
+
+      <div class="chart-wrap">
+        <h3>Évolution du capital</h3>
+        <svg id="ep-chart" viewBox="0 0 640 220" width="100%" height="220"></svg>
+        <div class="legend">
+          <span><i class="dot" style="background:#DDC7B6"></i>Capital versé net</span>
+          <span><i class="dot" style="background:#C6A98A"></i>Intérêts / plus-value</span>
+          <span><i class="dot" style="background:var(--navy)"></i>Capital total</span>
+        </div>
+      </div>
+
+      <button class="addbtn" id="ep-pdf-btn" style="border-style:solid;background:var(--navy);border-color:var(--navy);color:#fff;">Télécharger la simulation en PDF</button>
+      <a id="ep-pdf-link" class="hidden" target="_blank" style="display:block;text-align:center;margin-top:8px;font-size:13px;color:var(--navy);text-decoration:underline;font-weight:600;">Ouvrir le PDF généré</a>
+    </div>
+
+    <div id="ep-compare-block" class="hidden">
+      <div class="card">
+        <h2 style="color:var(--gold);">Placement A</h2>
+        <div class="field">
+          <label>Capital initial (€)</label>
+          <input type="number" id="ep-capital-a" value="5000" min="0" step="100">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Versement mensuel (€)</label>
+            <input type="number" id="ep-mensuel-a" value="150" min="0" step="10">
+          </div>
+          <div class="field">
+            <label>Durée (années)</label>
+            <input type="number" id="ep-duree-a" value="15" min="1" max="60" step="1">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Rendement annuel brut (%)</label>
+            <input type="number" id="ep-taux-a" value="4.5" min="-10" max="20" step="0.1">
+          </div>
+          <div class="field">
+            <label>Frais annuels sur encours (%)</label>
+            <input type="number" id="ep-frais-a" value="0.6" min="0" max="5" step="0.1">
+          </div>
+        </div>
+        <div class="field">
+          <label>Frais d'entrée / sur versements (%)</label>
+          <input type="number" id="ep-frais-entree-a" value="0" min="0" max="10" step="0.1">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 style="color:var(--navy);">Placement B</h2>
+        <div class="field">
+          <label>Capital initial (€)</label>
+          <input type="number" id="ep-capital-b" value="5000" min="0" step="100">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Versement mensuel (€)</label>
+            <input type="number" id="ep-mensuel-b" value="150" min="0" step="10">
+          </div>
+          <div class="field">
+            <label>Durée (années)</label>
+            <input type="number" id="ep-duree-b" value="15" min="1" max="60" step="1">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Rendement annuel brut (%)</label>
+            <input type="number" id="ep-taux-b" value="3" min="-10" max="20" step="0.1">
+          </div>
+          <div class="field">
+            <label>Frais annuels sur encours (%)</label>
+            <input type="number" id="ep-frais-b" value="0.8" min="0" max="5" step="0.1">
+          </div>
+        </div>
+        <div class="field">
+          <label>Frais d'entrée / sur versements (%)</label>
+          <input type="number" id="ep-frais-entree-b" value="2" min="0" max="10" step="0.1">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Comparatif</h2>
+        <table style="width:100%;border-collapse:collapse;font-size:13.5px;">
+          <tr style="border-bottom:1px solid var(--line);">
+            <td style="padding:8px 4px;color:var(--ink-soft);"></td>
+            <td style="padding:8px 4px;font-weight:700;color:var(--gold);">Placement A</td>
+            <td style="padding:8px 4px;font-weight:700;color:var(--navy);">Placement B</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--line);">
+            <td style="padding:8px 4px;color:var(--ink-soft);">Capital final</td>
+            <td style="padding:8px 4px;font-weight:600;" id="cmp-final-a">—</td>
+            <td style="padding:8px 4px;font-weight:600;" id="cmp-final-b">—</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--line);">
+            <td style="padding:8px 4px;color:var(--ink-soft);">Total versé</td>
+            <td style="padding:8px 4px;" id="cmp-verse-a">—</td>
+            <td style="padding:8px 4px;" id="cmp-verse-b">—</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--line);">
+            <td style="padding:8px 4px;color:var(--ink-soft);">Frais d'entrée</td>
+            <td style="padding:8px 4px;" id="cmp-frais-a">—</td>
+            <td style="padding:8px 4px;" id="cmp-frais-b">—</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 4px;color:var(--ink-soft);">Plus-value</td>
+            <td style="padding:8px 4px;font-weight:600;" id="cmp-gain-a">—</td>
+            <td style="padding:8px 4px;font-weight:600;" id="cmp-gain-b">—</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="chart-wrap">
+        <h3>Évolution comparée du capital</h3>
+        <svg id="ep-compare-chart" viewBox="0 0 640 220" width="100%" height="220"></svg>
+        <div class="legend">
+          <span><i class="dot" style="background:var(--gold)"></i>Placement A</span>
+          <span><i class="dot" style="background:var(--navy)"></i>Placement B</span>
+        </div>
+      </div>
+
+      <button class="addbtn" id="ep-pdf-compare-btn" style="border-style:solid;background:var(--navy);border-color:var(--navy);color:#fff;">Télécharger le comparatif en PDF</button>
+      <a id="ep-pdf-compare-link" class="hidden" target="_blank" style="display:block;text-align:center;margin-top:8px;font-size:13px;color:var(--navy);text-decoration:underline;font-weight:600;">Ouvrir le PDF généré</a>
+    </div>
+  </section>
+
+  <!-- ===================== RENTE ===================== -->
+  <section class="panel" id="panel-rente">
+    <div class="card">
+      <h2>Mode de calcul</h2>
+      <div class="segbtns">
+        <button class="active" data-rente-mode="simple">Taux simple</button>
+        <button data-rente-mode="bareme">Barème actuariel</button>
+      </div>
+
+      <div class="field">
+        <label>Capital du contrat (€)</label>
+        <input type="number" id="rt-capital" value="100000" min="0" step="1000">
+      </div>
+
+      <div id="rt-simple-fields">
+        <div class="field">
+          <label>Taux de conversion en rente (%)</label>
+          <input type="number" id="rt-taux-simple" value="4.5" min="0" max="15" step="0.1">
+        </div>
+      </div>
+
+      <div id="rt-bareme-fields" class="hidden">
+        <div class="row2">
+          <div class="field">
+            <label>Âge à la liquidation</label>
+            <input type="number" id="rt-age" value="65" min="45" max="99" step="1">
+          </div>
+          <div class="field">
+            <label>Sexe</label>
+            <select id="rt-sexe">
+              <option value="H">Homme</option>
+              <option value="F">Femme</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Taux technique (%)</label>
+          <input type="number" id="rt-taux-tech" value="0" min="0" max="5" step="0.1">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Taux moyen d'imposition sur la rente (%)</label>
+        <input type="number" id="rt-taux-impot" value="11" min="0" max="60" step="0.5">
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="label">Rente annuelle nette d'impôt</div>
+      <div class="headline" id="rt-out-nette">—</div>
+      <div class="sub">
+        <div>Rente mensuelle nette <span id="rt-out-mensuelle-nette">—</span></div>
+        <div>Rente annuelle brute <span id="rt-out-annuelle">—</span></div>
+        <div>Rente mensuelle brute <span id="rt-out-mensuelle">—</span></div>
+        <div id="rt-out-esperance-wrap" class="hidden">Espérance de vie résiduelle <span id="rt-out-esperance">—</span></div>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      Le mode « taux simple » applique le taux de conversion que tu saisis directement au capital.
+      Le mode « barème actuariel » estime une rente à partir de l'espérance de vie résiduelle de la population générale (données INSEE, approximation linéaire par âge) et du taux technique — il ne reproduit pas le barème propriétaire d'un assureur donné (qui intègre frais de gestion sur la rente, table TGH05/TGF05, options de réversion, garanties). À utiliser comme ordre de grandeur ; se référer à la simulation officielle du contrat pour un chiffre définitif.
+      <br><br>
+      Le « taux moyen d'imposition » est appliqué au montant brut de la rente pour donner un ordre de grandeur du net perçu. En réalité, le régime fiscal diffère selon le produit : rente viagère à titre onéreux (assurance-vie, PER par versements non déductibles) → seule une fraction du montant est imposable selon l'âge au premier versement (par exemple 30 % à partir de 70 ans) ; rente issue de versements PER déductibles → imposée comme une pension, avec abattement de 10 %. Le taux à saisir ici doit donc déjà correspondre au taux effectif sur le montant brut, à adapter au cas du client.
+    </div>
+  </section>
+
+  <!-- ===================== REVENUS COMPLEMENTAIRES ===================== -->
+  <section class="panel" id="panel-revenus">
+    <div class="card">
+      <h2>Contrat d'assurance-vie (plus de 8 ans)</h2>
+      <div class="row2">
+        <div class="field">
+          <label>Valeur actuelle du contrat (€)</label>
+          <input type="number" id="rv-valeur" value="150000" min="0" step="1000">
+        </div>
+        <div class="field">
+          <label>Total des versements nets (€)</label>
+          <input type="number" id="rv-versements" value="100000" min="0" step="1000">
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label style="margin-bottom:2px;">Part de plus-value dans le contrat</label>
+        <div id="rv-ratio-pv" style="font-size:14px;font-weight:600;color:var(--navy);">—</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Paramètres des retraits</h2>
+      <div class="segbtns">
+        <button class="active" data-rv-mode="epuisement">Avec épuisement</button>
+        <button data-rv-mode="perenne">Sans épuisement</button>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Rendement annuel pendant les retraits (%)</label>
+          <input type="number" id="rv-rendement" value="3" min="-5" max="15" step="0.1">
+        </div>
+        <div class="field" id="rv-duree-field">
+          <label>Durée des revenus (années)</label>
+          <input type="number" id="rv-duree" value="20" min="1" max="50" step="1">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Fiscalité du rachat (contrat &gt; 8 ans)</h2>
+      <div class="row2">
+        <div class="field">
+          <label>Situation fiscale</label>
+          <select id="rv-situation">
+            <option value="4600">Personne seule (abattement 4 600 €/an)</option>
+            <option value="9200">Couple imposition commune (abattement 9 200 €/an)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Prélèvement forfaitaire (%)</label>
+          <input type="number" id="rv-pfl" value="7.5" min="0" max="30" step="0.1">
+        </div>
+      </div>
+      <div class="field">
+        <label>Prélèvements sociaux (%)</label>
+        <input type="number" id="rv-ps" value="17.2" min="0" max="25" step="0.1">
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="label">Revenu net mensuel moyen</div>
+      <div class="headline" id="rv-out-net-mensuel">—</div>
+      <div class="sub">
+        <div>Revenu net annuel <span id="rv-out-net-annuel">—</span></div>
+        <div>Revenu brut annuel <span id="rv-out-brut">—</span></div>
+        <div>Dont plus-value retirée /an <span id="rv-out-gains">—</span></div>
+        <div>Prélèvements sociaux /an <span id="rv-out-ps">—</span></div>
+        <div>Impôt (PFL) /an <span id="rv-out-ir">—</span></div>
+        <div id="rv-out-epuise-wrap">Capital épuisé <span id="rv-out-epuise">—</span></div>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <h3>Capital restant dans le contrat</h3>
+      <svg id="rv-chart" viewBox="0 0 640 220" width="100%" height="220"></svg>
+    </div>
+
+    <div class="disclaimer">
+      Calcul simplifié : la part de plus-value retirée à chaque rachat est estimée au prorata de la part de plus-value actuelle du contrat, supposée constante sur toute la période (en réalité elle évolue légèrement avec les rachats et le rendement généré). Les prélèvements sociaux (17,2 %) s'appliquent sur la totalité de la plus-value retirée chaque année, sans abattement. Le prélèvement forfaitaire libératoire (7,5 % en-dessous de 150 000 € de versements cumulés, 12,8 % au-delà, hors option pour le barème de l'IR) ne s'applique qu'à la plus-value restant après l'abattement annuel. Mode « sans épuisement » : le revenu brut correspond au rendement du contrat, capital nominal maintenu constant (hors effet de l'inflation).
+    </div>
+  </section>
+
+  <!-- ===================== RENTABILITE ===================== -->
+  <section class="panel" id="panel-renta">
+    <div class="card">
+      <h2>Investissement initial</h2>
+      <div class="row2">
+        <div class="field">
+          <label>Montant investi (€)</label>
+          <input type="number" id="rz-initial" value="2000" min="0" step="10">
+        </div>
+        <div class="field">
+          <label>Date de l'investissement</label>
+          <input type="date" id="rz-date-init" value="2020-01-01">
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="rz-versements-card">
+      <button class="toggle-adv" id="rz-toggle-adv">+ Ajouter des versements complémentaires</button>
+      <div class="versements hidden" id="rz-versements-list"></div>
+      <button class="addbtn hidden" id="rz-add-versement">+ Ajouter un versement</button>
+    </div>
+
+    <div class="card">
+      <h2>Valeur actuelle</h2>
+      <div class="row2">
+        <div class="field">
+          <label>Valeur actuelle (€)</label>
+          <input type="number" id="rz-final" value="4000" min="0" step="10">
+        </div>
+        <div class="field">
+          <label>Date de valorisation</label>
+          <input type="date" id="rz-date-final">
+        </div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="label">Rendement annualisé</div>
+      <div class="headline" id="rz-out-cagr">—</div>
+      <div class="sub">
+        <div>Gain total <span id="rz-out-gain">—</span></div>
+        <div>Gain en % <span id="rz-out-gainpct">—</span></div>
+        <div>Durée <span id="rz-out-duree">—</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="disclaimer" style="margin-top:8px;">
+    Outil de simulation à visée pédagogique et commerciale — les hypothèses de rendement sont saisies manuellement et ne préjugent pas des performances futures. Les montants réels dépendent des conditions contractuelles, de la fiscalité applicable et de la table de mortalité propre à chaque assureur.
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" onerror="window.__jspdfLoadFailed = true;"></script>
+<script>
+// ---------- Utils ----------
+const eur = (n) => n.toLocaleString('fr-FR', {style:'currency', currency:'EUR', maximumFractionDigits:0});
+const eurDec = (n) => n.toLocaleString('fr-FR', {style:'currency', currency:'EUR', maximumFractionDigits:2});
+const pct = (n, digits=2) => n.toLocaleString('fr-FR', {minimumFractionDigits:digits, maximumFractionDigits:digits}) + ' %';
+
+// ---------- Tabs ----------
+document.querySelectorAll('nav.tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('section.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ===================== EPARGNE =====================
+function calcEpargne(p){
+  const tauxNetMensuel = (p.tauxAnnuel - p.fraisAnnuel)/12;
+  const capital0Net = p.capital0 * (1-p.fraisEntree);
+  const mensuelNet = p.mensuel * (1-p.fraisEntree);
+  const months = p.duree*12;
+  let capital = capital0Net;
+  let verseGross = p.capital0;
+  let verseNetCum = capital0Net;
+  const points = [{m:0, capital:capital0Net, verse:p.capital0, verseNet:capital0Net}];
+  for(let m=1; m<=months; m++){
+    capital = capital*(1+tauxNetMensuel) + mensuelNet;
+    verseGross += p.mensuel;
+    verseNetCum += mensuelNet;
+    if(m % Math.max(1, Math.round(months/60)) === 0 || m===months){
+      points.push({m, capital, verse:verseGross, verseNet:verseNetCum});
+    }
+  }
+  const fraisEntreeTotal = verseGross * p.fraisEntree;
+  const verseNet = verseGross - fraisEntreeTotal;
+  const gain = capital - verseNet;
+  return {points, capitalFinal:capital, verseGross, verseNet, fraisEntreeTotal, gain, rendementNet:(p.tauxAnnuel-p.fraisAnnuel)*100};
+}
+
+function readEpargneParams(suffix){
+  const s = suffix ? '-'+suffix : '';
+  return {
+    capital0: parseFloat(document.getElementById('ep-capital'+s).value)||0,
+    mensuel: parseFloat(document.getElementById('ep-mensuel'+s).value)||0,
+    duree: parseInt(document.getElementById('ep-duree'+s).value)||0,
+    tauxAnnuel: (parseFloat(document.getElementById('ep-taux'+s).value)||0)/100,
+    fraisAnnuel: (parseFloat(document.getElementById('ep-frais'+s).value)||0)/100,
+    fraisEntree: (parseFloat(document.getElementById('ep-frais-entree'+s).value)||0)/100
+  };
+}
+
+function computeEpargne(){
+  const p = readEpargneParams();
+  const r = calcEpargne(p);
+
+  document.getElementById('ep-out-final').textContent = eur(r.capitalFinal);
+  document.getElementById('ep-out-verse-net').textContent = eur(r.verseNet);
+  document.getElementById('ep-out-frais-entree').textContent = eur(r.fraisEntreeTotal);
+  document.getElementById('ep-out-gain').textContent = (r.gain>=0?'+':'') + eur(r.gain);
+  document.getElementById('ep-out-net').textContent = pct(r.rendementNet,2);
+
+  drawEpargneChart(r.points);
+}
+
+function computeComparaison(){
+  const pa = readEpargneParams('a');
+  const pb = readEpargneParams('b');
+  const ra = calcEpargne(pa);
+  const rb = calcEpargne(pb);
+
+  document.getElementById('cmp-final-a').textContent = eur(ra.capitalFinal);
+  document.getElementById('cmp-final-b').textContent = eur(rb.capitalFinal);
+  document.getElementById('cmp-verse-a').textContent = eur(ra.verseNet);
+  document.getElementById('cmp-verse-b').textContent = eur(rb.verseNet);
+  document.getElementById('cmp-frais-a').textContent = eur(ra.fraisEntreeTotal);
+  document.getElementById('cmp-frais-b').textContent = eur(rb.fraisEntreeTotal);
+  document.getElementById('cmp-gain-a').textContent = (ra.gain>=0?'+':'') + eur(ra.gain);
+  document.getElementById('cmp-gain-b').textContent = (rb.gain>=0?'+':'') + eur(rb.gain);
+
+  drawCompareChart('ep-compare-chart', ra.points, rb.points);
+}
+
+document.querySelectorAll('[data-ep-mode]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-ep-mode]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const mode = btn.dataset.epMode;
+    document.getElementById('ep-simple-block').classList.toggle('hidden', mode!=='simple');
+    document.getElementById('ep-compare-block').classList.toggle('hidden', mode!=='comparaison');
+    if(mode==='comparaison') computeComparaison();
+  });
+});
+
+function drawEpargneChart(points){
+  const svg = document.getElementById('ep-chart');
+  svg.innerHTML = '';
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const W=640,H=220,padL=50,padB=24,padT=10,padR=10;
+  const maxVal = Math.max(...points.map(p=>p.capital), 1);
+  const maxM = Math.max(...points.map(p=>p.m), 1);
+
+  const x = (m) => padL + (m/maxM)*(W-padL-padR);
+  const y = (v) => H-padB - (v/maxVal)*(H-padT-padB);
+  const baseline = H-padB;
+
+  // grid lines
+  for(let i=0;i<=4;i++){
+    const val = maxVal*i/4;
+    const yy = y(val);
+    const line = document.createElementNS(svgNS,'line');
+    line.setAttribute('x1',padL); line.setAttribute('x2',W-padR);
+    line.setAttribute('y1',yy); line.setAttribute('y2',yy);
+    line.setAttribute('stroke','#EDE7DC'); line.setAttribute('stroke-width','1');
+    svg.appendChild(line);
+    const label = document.createElementNS(svgNS,'text');
+    label.setAttribute('x',4); label.setAttribute('y',yy+4);
+    label.setAttribute('font-size','10'); label.setAttribute('fill','#5B5A72');
+    label.textContent = val>=1000 ? Math.round(val/1000)+'k' : Math.round(val);
+    svg.appendChild(label);
+  }
+
+  // Aire 1 : capital versé net (base -> courbe des versements nets)
+  let dVerse = 'M ' + x(points[0].m).toFixed(1) + ' ' + baseline + ' ';
+  points.forEach(p=> dVerse += 'L ' + x(p.m).toFixed(1) + ' ' + y(p.verseNet).toFixed(1) + ' ');
+  dVerse += 'L ' + x(points[points.length-1].m).toFixed(1) + ' ' + baseline + ' Z';
+  const areaVerse = document.createElementNS(svgNS,'path');
+  areaVerse.setAttribute('d', dVerse);
+  areaVerse.setAttribute('fill', '#DDC7B6');
+  svg.appendChild(areaVerse);
+
+  // Aire 2 : intérêts / plus-value (courbe des versements nets -> courbe du capital)
+  let dInteret = 'M ' + x(points[0].m).toFixed(1) + ' ' + y(points[0].verseNet).toFixed(1) + ' ';
+  points.forEach(p=> dInteret += 'L ' + x(p.m).toFixed(1) + ' ' + y(Math.max(p.capital,p.verseNet)).toFixed(1) + ' ');
+  for(let i=points.length-1;i>=0;i--){
+    dInteret += 'L ' + x(points[i].m).toFixed(1) + ' ' + y(points[i].verseNet).toFixed(1) + ' ';
+  }
+  dInteret += 'Z';
+  const areaInteret = document.createElementNS(svgNS,'path');
+  areaInteret.setAttribute('d', dInteret);
+  areaInteret.setAttribute('fill', '#C6A98A');
+  svg.appendChild(areaInteret);
+
+  // Contour du capital total
+  let dCap = '';
+  points.forEach((p,i)=> dCap += (i===0?'M':'L') + x(p.m).toFixed(1) + ' ' + y(p.capital).toFixed(1) + ' ');
+  const capLine = document.createElementNS(svgNS,'path');
+  capLine.setAttribute('d', dCap);
+  capLine.setAttribute('fill','none');
+  capLine.setAttribute('stroke','#121442');
+  capLine.setAttribute('stroke-width','1.5');
+  svg.appendChild(capLine);
+
+  const last = points[points.length-1];
+  const circle = document.createElementNS(svgNS,'circle');
+  circle.setAttribute('cx', x(last.m)); circle.setAttribute('cy', y(last.capital));
+  circle.setAttribute('r', 4); circle.setAttribute('fill','#121442');
+  svg.appendChild(circle);
+}
+
+function drawCompareChart(svgId, pointsA, pointsB){
+  const svg = document.getElementById(svgId);
+  svg.innerHTML = '';
+  const W=640,H=220,padL=50,padB=24,padT=10,padR=10;
+  const maxVal = Math.max(...pointsA.map(p=>p.capital), ...pointsB.map(p=>p.capital), 1);
+  const maxM = Math.max(pointsA[pointsA.length-1].m, pointsB[pointsB.length-1].m, 1);
+  const x = (m) => padL + (m/maxM)*(W-padL-padR);
+  const y = (v) => H-padB - (v/maxVal)*(H-padT-padB);
+
+  for(let i=0;i<=4;i++){
+    const val = maxVal*i/4;
+    const yy = y(val);
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',padL); line.setAttribute('x2',W-padR);
+    line.setAttribute('y1',yy); line.setAttribute('y2',yy);
+    line.setAttribute('stroke','#EDE7DC'); line.setAttribute('stroke-width','1');
+    svg.appendChild(line);
+    const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+    label.setAttribute('x',4); label.setAttribute('y',yy+4);
+    label.setAttribute('font-size','10'); label.setAttribute('fill','#5B5A72');
+    label.textContent = val>=1000 ? Math.round(val/1000)+'k' : Math.round(val);
+    svg.appendChild(label);
+  }
+
+  const drawSeries = (points, color) => {
+    let d = '';
+    points.forEach((p,i)=>{ d += (i===0?'M':'L') + x(p.m).toFixed(1) + ' ' + y(p.capital).toFixed(1) + ' '; });
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d', d);
+    path.setAttribute('fill','none');
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', 3);
+    path.setAttribute('stroke-linecap','round');
+    path.setAttribute('stroke-linejoin','round');
+    svg.appendChild(path);
+    const last = points[points.length-1];
+    const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx', x(last.m)); circle.setAttribute('cy', y(last.capital));
+    circle.setAttribute('r', 4); circle.setAttribute('fill', color);
+    svg.appendChild(circle);
+  };
+  drawSeries(pointsA, '#C6A98A');
+  drawSeries(pointsB, '#121442');
+}
+
+['ep-capital-a','ep-mensuel-a','ep-duree-a','ep-taux-a','ep-frais-a','ep-frais-entree-a',
+ 'ep-capital-b','ep-mensuel-b','ep-duree-b','ep-taux-b','ep-frais-b','ep-frais-entree-b'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', computeComparaison);
+});
+
+['ep-capital','ep-mensuel','ep-duree','ep-taux','ep-frais','ep-frais-entree'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', computeEpargne);
+});
+
+// ===================== PDF EXPORT (EPARGNE) =====================
+function pdfHeader(doc, title, subtitle){
+  doc.setFillColor(18,20,66); // navy
+  doc.rect(0,0,210,32,'F');
+  doc.setDrawColor(198,169,138); // gold
+  doc.setLineWidth(1.2);
+  doc.line(0,32,210,32);
+  doc.setTextColor(221,199,182); // beige
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(9);
+  doc.text('CAPFINANCES', 14, 12);
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(18);
+  doc.text(title, 14, 22);
+  doc.setTextColor(221,199,182);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(9.5);
+  doc.text(subtitle, 14, 28);
+}
+
+function pdfFooter(doc, text){
+  doc.setFontSize(7.5);
+  doc.setTextColor(120,120,120);
+  doc.setFont('helvetica','normal');
+  const lines = doc.splitTextToSize(text, 182);
+  doc.text(lines, 14, 285);
+}
+
+function pdfSectionTitle(doc, text, y){
+  doc.setTextColor(18,20,66);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(12);
+  doc.text(text, 14, y);
+  doc.setDrawColor(228,220,208);
+  doc.setLineWidth(0.4);
+  doc.line(14, y+2, 196, y+2);
+}
+
+function pdfKeyValueRow(doc, label, value, x, y, labelColor, valueBold){
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(9.5);
+  doc.setTextColor(91,90,114);
+  doc.text(label, x, y);
+  doc.setFont('helvetica', valueBold?'bold':'normal');
+  doc.setFontSize(10.5);
+  doc.setTextColor(26,26,46);
+  doc.text(value, x, y+5.5);
+}
+
+function pdfFillArea(doc, points, bottomFn, topFn, colorRgb, px, py){
+  const [r,g,b] = colorRgb;
+  doc.setFillColor(r,g,b);
+  for(let i=1;i<points.length;i++){
+    const x1=px(points[i-1].m), x2=px(points[i].m);
+    const yB1=py(bottomFn(points[i-1])), yT1=py(topFn(points[i-1]));
+    const yB2=py(bottomFn(points[i])), yT2=py(topFn(points[i]));
+    doc.triangle(x1,yB1,x1,yT1,x2,yT2,'F');
+    doc.triangle(x1,yB1,x2,yT2,x2,yB2,'F');
+  }
+}
+
+function pdfXAxisTicks(doc, x, y, w, h, xMax){
+  const px = (m) => x + (m/xMax)*w;
+  const totalYears = xMax/12;
+  const nbTicks = totalYears <= 6 ? Math.max(1,Math.round(totalYears)) : 5;
+  doc.setDrawColor(200,200,200);
+  doc.setLineWidth(0.3);
+  doc.line(x, y+h, x+w, y+h);
+  for(let i=0;i<=nbTicks;i++){
+    const m = xMax*i/nbTicks;
+    const years = Math.round(m/12);
+    const xx = px(m);
+    doc.line(xx, y+h, xx, y+h+1.5);
+    doc.setFontSize(7);
+    doc.setTextColor(120,120,120);
+    doc.text(years+' ans', xx, y+h+5, {align:'center'});
+  }
+}
+
+function pdfYGridLines(doc, x, y, w, h, maxVal){
+  for(let i=1;i<=3;i++){
+    const yy = y + h - (h*i/4);
+    doc.setDrawColor(240,235,226);
+    doc.line(x, yy, x+w, yy);
+    doc.setFontSize(7);
+    doc.setTextColor(120,120,120);
+    doc.text(Math.round(maxVal*i/4/1000)+'k', x-9, yy+1.5);
+  }
+}
+
+function pdfLegendSwatch(doc, x, y, colorRgb, label){
+  const [r,g,b] = colorRgb;
+  doc.setFillColor(r,g,b);
+  doc.rect(x, y-2.6, 3, 3, 'F');
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(91,90,114);
+  doc.text(label, x+5, y);
+}
+
+function pdfLineChart(doc, x, y, w, h, seriesList, xMax){
+  doc.setDrawColor(228,220,208);
+  doc.setLineWidth(0.3);
+  doc.rect(x, y, w, h);
+  const maxVal = Math.max(...seriesList.flatMap(s=>s.points.map(p=>p.capital)), 1);
+  const px = (m) => x + (m/xMax)*w;
+  const py = (v) => y+h - (v/maxVal)*h;
+
+  pdfYGridLines(doc, x, y, w, h, maxVal);
+
+  seriesList.forEach(s=>{
+    const [r,g,b] = s.colorRgb;
+    doc.setDrawColor(r,g,b);
+    doc.setLineWidth(0.7);
+    for(let i=1;i<s.points.length;i++){
+      doc.line(px(s.points[i-1].m), py(s.points[i-1].capital), px(s.points[i].m), py(s.points[i].capital));
+    }
+  });
+
+  pdfXAxisTicks(doc, x, y, w, h, xMax);
+}
+
+function pdfStackedChart(doc, x, y, w, h, points, xMax){
+  doc.setDrawColor(228,220,208);
+  doc.setLineWidth(0.3);
+  doc.rect(x, y, w, h);
+  const maxVal = Math.max(...points.map(p=>p.capital), 1);
+  const px = (m) => x + (m/xMax)*w;
+  const py = (v) => y+h - (v/maxVal)*h;
+
+  pdfYGridLines(doc, x, y, w, h, maxVal);
+
+  pdfFillArea(doc, points, ()=>0, p=>p.verseNet, [221,199,182], px, py);
+  pdfFillArea(doc, points, p=>p.verseNet, p=>Math.max(p.capital,p.verseNet), [198,169,138], px, py);
+
+  doc.setDrawColor(18,20,66);
+  doc.setLineWidth(0.6);
+  for(let i=1;i<points.length;i++){
+    doc.line(px(points[i-1].m), py(points[i-1].capital), px(points[i].m), py(points[i].capital));
+  }
+
+  pdfXAxisTicks(doc, x, y, w, h, xMax);
+
+  pdfLegendSwatch(doc, x, y+h+11, [221,199,182], 'Capital versé net');
+  pdfLegendSwatch(doc, x+65, y+h+11, [198,169,138], 'Intérêts / plus-value');
+  pdfLegendSwatch(doc, x+130, y+h+11, [18,20,66], 'Capital total');
+}
+
+function generateEpargnePdf(){
+  const btn = document.getElementById('ep-pdf-btn');
+  const originalLabel = btn.textContent;
+  try{
+    if(!window.jspdf || !window.jspdf.jsPDF){
+      alert("La librairie PDF n'a pas pu se charger (connexion internet requise). Réessaie, ou ouvre ce fichier directement dans Safari/Chrome plutôt que dans l'aperçu.");
+      return;
+    }
+    btn.textContent = 'Génération en cours…';
+
+    const p = readEpargneParams();
+    const r = calcEpargne(p);
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    pdfHeader(doc, 'Simulation d\'épargne', 'Édité le ' + new Date().toLocaleDateString('fr-FR'));
+
+    pdfSectionTitle(doc, 'Paramètres', 46);
+    const params = [
+      ['Capital initial', eur(p.capital0)],
+      ['Versement mensuel', eur(p.mensuel)],
+      ['Durée', p.duree + ' ans'],
+      ['Rendement annuel brut', pct(p.tauxAnnuel*100)],
+      ['Frais annuels sur encours', pct(p.fraisAnnuel*100)],
+      ['Frais d\'entrée', pct(p.fraisEntree*100)]
+    ];
+    params.forEach((row,i)=>{
+      const col = i%2, ligne = Math.floor(i/2);
+      pdfKeyValueRow(doc, row[0], row[1], 14 + col*95, 58 + ligne*15);
+    });
+
+    pdfSectionTitle(doc, 'Résultats', 108);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(22);
+    doc.setTextColor(18,20,66);
+    doc.text(eur(r.capitalFinal), 14, 122);
+    doc.setFontSize(9);
+    doc.setFont('helvetica','normal');
+    doc.setTextColor(91,90,114);
+    doc.text('Capital final estimé', 14, 127);
+
+    const results = [
+      ['Total versé (net de frais d\'entrée)', eur(r.verseNet)],
+      ['Frais d\'entrée cumulés', eur(r.fraisEntreeTotal)],
+      ['Plus-value', (r.gain>=0?'+':'') + eur(r.gain)],
+      ['Rendement net annuel', pct(r.rendementNet)]
+    ];
+    results.forEach((row,i)=>{
+      const col = i%2, ligne = Math.floor(i/2);
+      pdfKeyValueRow(doc, row[0], row[1], 14 + col*95, 138 + ligne*15);
+    });
+
+    pdfSectionTitle(doc, 'Évolution du capital', 168);
+    pdfStackedChart(doc, 20, 176, 176, 55, r.points, r.points[r.points.length-1].m);
+
+    pdfFooter(doc, 'Simulation à visée pédagogique et commerciale, non contractuelle. Les hypothèses de rendement sont saisies manuellement et ne préjugent pas des performances futures. Les montants réels dépendent des conditions du contrat souscrit et de la fiscalité applicable.');
+
+    const filename = 'simulation-epargne-' + new Date().toISOString().slice(0,10) + '.pdf';
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    const link = document.getElementById('ep-pdf-link');
+    link.href = url;
+    link.download = filename;
+    link.textContent = '📄 Ouvrir / télécharger : ' + filename;
+    link.classList.remove('hidden');
+    link.click();
+  } catch(err){
+    alert('La génération du PDF a échoué : ' + err.message);
+    console.error(err);
+  } finally {
+    btn.textContent = originalLabel;
+  }
+}
+
+function generateComparaisonPdf(){
+  const btn = document.getElementById('ep-pdf-compare-btn');
+  const originalLabel = btn.textContent;
+  try{
+    if(!window.jspdf || !window.jspdf.jsPDF){
+      alert("La librairie PDF n'a pas pu se charger (connexion internet requise). Réessaie, ou ouvre ce fichier directement dans Safari/Chrome plutôt que dans l'aperçu.");
+      return;
+    }
+    btn.textContent = 'Génération en cours…';
+
+    const pa = readEpargneParams('a');
+    const pb = readEpargneParams('b');
+    const ra = calcEpargne(pa);
+    const rb = calcEpargne(pb);
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    pdfHeader(doc, 'Comparatif de placements', 'Édité le ' + new Date().toLocaleDateString('fr-FR'));
+
+    pdfSectionTitle(doc, 'Paramètres', 46);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(9.5);
+    doc.setTextColor(198,169,138);
+    doc.text('Placement A', 90, 54);
+    doc.setTextColor(18,20,66);
+    doc.text('Placement B', 145, 54);
+
+    const rows = [
+      ['Capital initial', eur(pa.capital0), eur(pb.capital0)],
+      ['Versement mensuel', eur(pa.mensuel), eur(pb.mensuel)],
+      ['Durée', pa.duree+' ans', pb.duree+' ans'],
+      ['Rendement annuel brut', pct(pa.tauxAnnuel*100), pct(pb.tauxAnnuel*100)],
+      ['Frais annuels sur encours', pct(pa.fraisAnnuel*100), pct(pb.fraisAnnuel*100)],
+      ['Frais d\'entrée', pct(pa.fraisEntree*100), pct(pb.fraisEntree*100)]
+    ];
+    let y = 62;
+    rows.forEach(row=>{
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(9.5);
+      doc.setTextColor(91,90,114);
+      doc.text(row[0], 14, y);
+      doc.setTextColor(26,26,46);
+      doc.text(row[1], 90, y);
+      doc.text(row[2], 145, y);
+      y += 7;
+    });
+
+    pdfSectionTitle(doc, 'Résultats', y+6);
+    y += 16;
+    const results = [
+      ['Capital final', eur(ra.capitalFinal), eur(rb.capitalFinal)],
+      ['Total versé (net)', eur(ra.verseNet), eur(rb.verseNet)],
+      ['Frais d\'entrée cumulés', eur(ra.fraisEntreeTotal), eur(rb.fraisEntreeTotal)],
+      ['Plus-value', (ra.gain>=0?'+':'')+eur(ra.gain), (rb.gain>=0?'+':'')+eur(rb.gain)]
+    ];
+    results.forEach(row=>{
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(9.5);
+      doc.setTextColor(91,90,114);
+      doc.text(row[0], 14, y);
+      doc.setFont('helvetica','bold');
+      doc.setTextColor(26,26,46);
+      doc.text(row[1], 90, y);
+      doc.text(row[2], 145, y);
+      y += 7;
+    });
+
+    pdfSectionTitle(doc, 'Évolution comparée du capital', y+8);
+    const xMax = Math.max(ra.points[ra.points.length-1].m, rb.points[rb.points.length-1].m);
+    pdfLineChart(doc, 20, y+16, 176, 60, [
+      {points:ra.points, colorRgb:[198,169,138]},
+      {points:rb.points, colorRgb:[18,20,66]}
+    ], xMax);
+
+    pdfFooter(doc, 'Simulation à visée pédagogique et commerciale, non contractuelle. Les hypothèses de rendement sont saisies manuellement et ne préjugent pas des performances futures. Les montants réels dépendent des conditions du contrat souscrit et de la fiscalité applicable.');
+
+    const filename = 'comparatif-placements-' + new Date().toISOString().slice(0,10) + '.pdf';
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    const link = document.getElementById('ep-pdf-compare-link');
+    link.href = url;
+    link.download = filename;
+    link.textContent = '📄 Ouvrir / télécharger : ' + filename;
+    link.classList.remove('hidden');
+    link.click();
+  } catch(err){
+    alert('La génération du PDF a échoué : ' + err.message);
+    console.error(err);
+  } finally {
+    btn.textContent = originalLabel;
+  }
+}
+
+document.getElementById('ep-pdf-btn').addEventListener('click', generateEpargnePdf);
+document.getElementById('ep-pdf-compare-btn').addEventListener('click', generateComparaisonPdf);
+
+// ===================== RENTE =====================
+// Espérance de vie résiduelle approximative (population générale, données INSEE arrondies)
+const esperanceVie = {
+  H: {50:31.5, 55:27.0, 60:23.5, 65:19.5, 70:15.8, 75:12.3, 80:9.1, 85:6.4, 90:4.4, 95:3.0},
+  F: {50:36.8, 55:32.0, 60:27.5, 65:23.5, 70:19.3, 75:15.3, 80:11.4, 85:7.9, 90:5.3, 95:3.5}
+};
+function interpEsperance(sexe, age){
+  const table = esperanceVie[sexe];
+  const ages = Object.keys(table).map(Number).sort((a,b)=>a-b);
+  if(age<=ages[0]) return table[ages[0]];
+  if(age>=ages[ages.length-1]) return table[ages[ages.length-1]];
+  for(let i=0;i<ages.length-1;i++){
+    if(age>=ages[i] && age<=ages[i+1]){
+      const a0=ages[i], a1=ages[i+1];
+      const v0=table[a0], v1=table[a1];
+      return v0 + (v1-v0)*(age-a0)/(a1-a0);
+    }
+  }
+  return table[ages[ages.length-1]];
+}
+
+document.querySelectorAll('[data-rente-mode]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-rente-mode]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const mode = btn.dataset.renteMode;
+    document.getElementById('rt-simple-fields').classList.toggle('hidden', mode!=='simple');
+    document.getElementById('rt-bareme-fields').classList.toggle('hidden', mode!=='bareme');
+    document.getElementById('rt-out-esperance-wrap').classList.toggle('hidden', mode!=='bareme');
+    computeRente();
+  });
+});
+
+function computeRente(){
+  const capital = parseFloat(document.getElementById('rt-capital').value)||0;
+  const mode = document.querySelector('[data-rente-mode].active').dataset.renteMode;
+  let renteAnnuelle = 0;
+
+  if(mode==='simple'){
+    const taux = (parseFloat(document.getElementById('rt-taux-simple').value)||0)/100;
+    renteAnnuelle = capital * taux;
+  } else {
+    const age = parseInt(document.getElementById('rt-age').value)||65;
+    const sexe = document.getElementById('rt-sexe').value;
+    const tauxTech = (parseFloat(document.getElementById('rt-taux-tech').value)||0)/100;
+    const n = interpEsperance(sexe, age);
+    const facteur = tauxTech>0 ? (1-Math.pow(1+tauxTech,-n))/tauxTech : n;
+    renteAnnuelle = facteur>0 ? capital/facteur : 0;
+    document.getElementById('rt-out-esperance').textContent = n.toFixed(1)+' ans';
+  }
+
+  const tauxImpot = (parseFloat(document.getElementById('rt-taux-impot').value)||0)/100;
+  const renteNette = renteAnnuelle * (1-tauxImpot);
+
+  document.getElementById('rt-out-annuelle').textContent = eur(renteAnnuelle);
+  document.getElementById('rt-out-mensuelle').textContent = eur(renteAnnuelle/12);
+  document.getElementById('rt-out-nette').textContent = eur(renteNette);
+  document.getElementById('rt-out-mensuelle-nette').textContent = eur(renteNette/12);
+}
+
+['rt-capital','rt-taux-simple','rt-age','rt-sexe','rt-taux-tech','rt-taux-impot'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', computeRente);
+  document.getElementById(id).addEventListener('change', computeRente);
+});
+
+// ===================== REVENUS COMPLEMENTAIRES =====================
+document.querySelectorAll('[data-rv-mode]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-rv-mode]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('rv-duree-field').classList.toggle('hidden', btn.dataset.rvMode!=='epuisement');
+    document.getElementById('rv-out-epuise-wrap').classList.toggle('hidden', btn.dataset.rvMode!=='epuisement');
+    computeRevenus();
+  });
+});
+
+function drawLineChart(svgId, points, color){
+  const svg = document.getElementById(svgId);
+  svg.innerHTML = '';
+  const W=640,H=220,padL=50,padB=24,padT=10,padR=10;
+  const maxVal = Math.max(...points.map(p=>p.capital), 1);
+  const maxX = Math.max(...points.map(p=>p.year), 1);
+  const x = (v) => padL + (v/maxX)*(W-padL-padR);
+  const y = (v) => H-padB - (v/maxVal)*(H-padT-padB);
+
+  for(let i=0;i<=4;i++){
+    const val = maxVal*i/4;
+    const yy = y(val);
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',padL); line.setAttribute('x2',W-padR);
+    line.setAttribute('y1',yy); line.setAttribute('y2',yy);
+    line.setAttribute('stroke','#EDE7DC'); line.setAttribute('stroke-width','1');
+    svg.appendChild(line);
+    const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+    label.setAttribute('x',4); label.setAttribute('y',yy+4);
+    label.setAttribute('font-size','10'); label.setAttribute('fill','#5B5A72');
+    label.textContent = val>=1000 ? Math.round(val/1000)+'k' : Math.round(val);
+    svg.appendChild(label);
+  }
+
+  let d = '';
+  points.forEach((p,i)=>{ d += (i===0?'M':'L') + x(p.year).toFixed(1) + ' ' + y(p.capital).toFixed(1) + ' '; });
+  const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d', d);
+  path.setAttribute('fill','none');
+  path.setAttribute('stroke', color);
+  path.setAttribute('stroke-width', 3);
+  path.setAttribute('stroke-linecap','round');
+  path.setAttribute('stroke-linejoin','round');
+  svg.appendChild(path);
+
+  const last = points[points.length-1];
+  const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  circle.setAttribute('cx', x(last.year)); circle.setAttribute('cy', y(last.capital));
+  circle.setAttribute('r', 4); circle.setAttribute('fill','#121442');
+  svg.appendChild(circle);
+}
+
+function computeRevenus(){
+  const valeur = parseFloat(document.getElementById('rv-valeur').value)||0;
+  const versements = parseFloat(document.getElementById('rv-versements').value)||0;
+  const ratioPV = valeur>0 ? Math.max(0, Math.min(1,(valeur-versements)/valeur)) : 0;
+  document.getElementById('rv-ratio-pv').textContent = pct(ratioPV*100,1) + ' du contrat (' + eur(valeur*ratioPV) + ')';
+
+  const mode = document.querySelector('[data-rv-mode].active').dataset.rvMode;
+  const rendement = (parseFloat(document.getElementById('rv-rendement').value)||0)/100;
+  const abattement = parseFloat(document.getElementById('rv-situation').value)||4600;
+  const tauxPFL = (parseFloat(document.getElementById('rv-pfl').value)||0)/100;
+  const tauxPS = (parseFloat(document.getElementById('rv-ps').value)||0)/100;
+
+  let points = [{year:0, capital:valeur}];
+  let revenuBrutAnnuel, netAnnuelMoyen, psAnnuelMoyen, irAnnuelMoyen, gainsAnnuelMoyen, capitalEpuiseTexte;
+
+  if(mode==='epuisement'){
+    const n = parseInt(document.getElementById('rv-duree').value)||1;
+    revenuBrutAnnuel = rendement>0 ? valeur*rendement/(1-Math.pow(1+rendement,-n)) : valeur/n;
+    let capital = valeur;
+    let totalNet=0, totalPS=0, totalIR=0, totalGains=0;
+    for(let y=1;y<=n;y++){
+      const gains = revenuBrutAnnuel*ratioPV;
+      const ps = gains*tauxPS;
+      const gainsApresAbat = Math.max(0, gains-abattement);
+      const ir = gainsApresAbat*tauxPFL;
+      const net = revenuBrutAnnuel-ps-ir;
+      totalNet+=net; totalPS+=ps; totalIR+=ir; totalGains+=gains;
+      capital = Math.max(0, capital*(1+rendement) - revenuBrutAnnuel);
+      points.push({year:y, capital});
+    }
+    netAnnuelMoyen = totalNet/n;
+    psAnnuelMoyen = totalPS/n;
+    irAnnuelMoyen = totalIR/n;
+    gainsAnnuelMoyen = totalGains/n;
+    capitalEpuiseTexte = 'en ' + n + ' ans';
+  } else {
+    revenuBrutAnnuel = valeur*rendement;
+    const gains = revenuBrutAnnuel*ratioPV;
+    const ps = gains*tauxPS;
+    const gainsApresAbat = Math.max(0, gains-abattement);
+    const ir = gainsApresAbat*tauxPFL;
+    netAnnuelMoyen = revenuBrutAnnuel-ps-ir;
+    psAnnuelMoyen = ps;
+    irAnnuelMoyen = ir;
+    gainsAnnuelMoyen = gains;
+    for(let y=0;y<=30;y++) points.push({year:y, capital:valeur});
+    capitalEpuiseTexte = 'jamais (capital maintenu)';
+  }
+
+  document.getElementById('rv-out-net-mensuel').textContent = eur(netAnnuelMoyen/12);
+  document.getElementById('rv-out-net-annuel').textContent = eur(netAnnuelMoyen);
+  document.getElementById('rv-out-brut').textContent = eur(revenuBrutAnnuel);
+  document.getElementById('rv-out-gains').textContent = eur(gainsAnnuelMoyen);
+  document.getElementById('rv-out-ps').textContent = eur(psAnnuelMoyen);
+  document.getElementById('rv-out-ir').textContent = eur(irAnnuelMoyen);
+  document.getElementById('rv-out-epuise').textContent = capitalEpuiseTexte;
+
+  drawLineChart('rv-chart', points, '#C6A98A');
+}
+
+['rv-valeur','rv-versements','rv-rendement','rv-duree','rv-situation','rv-pfl','rv-ps'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', computeRevenus);
+  document.getElementById(id).addEventListener('change', computeRevenus);
+});
+
+// ===================== RENTABILITE =====================
+let versementsExtra = [];
+let vId = 0;
+
+document.getElementById('rz-toggle-adv').addEventListener('click', ()=>{
+  const list = document.getElementById('rz-versements-list');
+  const addBtn = document.getElementById('rz-add-versement');
+  const willShow = list.classList.contains('hidden');
+  list.classList.toggle('hidden');
+  addBtn.classList.toggle('hidden');
+  document.getElementById('rz-toggle-adv').textContent = willShow ? '− Masquer les versements complémentaires' : '+ Ajouter des versements complémentaires';
+  if(willShow && versementsExtra.length===0){
+    addVersementRow();
+  }
+});
+
+document.getElementById('rz-add-versement').addEventListener('click', addVersementRow);
+
+function addVersementRow(){
+  const id = vId++;
+  versementsExtra.push({id, montant:500, date: new Date().toISOString().slice(0,10)});
+  renderVersements();
+}
+
+function renderVersements(){
+  const list = document.getElementById('rz-versements-list');
+  list.innerHTML = '';
+  versementsExtra.forEach(v=>{
+    const row = document.createElement('div');
+    row.className='vrow';
+    row.innerHTML = `
+      <input type="number" value="${v.montant}" step="10" placeholder="Montant (€)" data-vid="${v.id}" data-field="montant">
+      <input type="date" value="${v.date}" data-vid="${v.id}" data-field="date">
+      <button data-remove="${v.id}">×</button>
+    `;
+    list.appendChild(row);
+  });
+  list.querySelectorAll('input').forEach(inp=>{
+    inp.addEventListener('input', (e)=>{
+      const id = parseInt(e.target.dataset.vid);
+      const field = e.target.dataset.field;
+      const v = versementsExtra.find(x=>x.id===id);
+      v[field] = field==='montant' ? parseFloat(e.target.value)||0 : e.target.value;
+      computeRentabilite();
+    });
+  });
+  list.querySelectorAll('button[data-remove]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      versementsExtra = versementsExtra.filter(x=>x.id!==parseInt(btn.dataset.remove));
+      renderVersements();
+      computeRentabilite();
+    });
+  });
+}
+
+function daysBetween(d1, d2){
+  return (new Date(d2) - new Date(d1)) / (1000*60*60*24);
+}
+
+function xirr(cashflows){
+  // cashflows: [{amount, date}], amount negative = investissement, positive = valeur finale
+  const d0 = new Date(cashflows[0].date);
+  const npv = (rate) => cashflows.reduce((sum,cf)=>{
+    const t = daysBetween(d0, cf.date)/365;
+    return sum + cf.amount / Math.pow(1+rate, t);
+  }, 0);
+  let low=-0.99, high=10, mid=0.1;
+  for(let i=0;i<100;i++){
+    mid = (low+high)/2;
+    const val = npv(mid);
+    if(Math.abs(val) < 0.01) break;
+    if(val>0) low=mid; else high=mid;
+  }
+  return mid;
+}
+
+function computeRentabilite(){
+  const initial = parseFloat(document.getElementById('rz-initial').value)||0;
+  const dateInit = document.getElementById('rz-date-init').value;
+  const final = parseFloat(document.getElementById('rz-final').value)||0;
+  const dateFinal = document.getElementById('rz-date-final').value || new Date().toISOString().slice(0,10);
+
+  if(!dateInit || initial<=0){
+    return;
+  }
+
+  const dureeAns = daysBetween(dateInit, dateFinal)/365.25;
+  const totalVerse = initial + versementsExtra.reduce((s,v)=>s+v.montant,0);
+  const gain = final - totalVerse;
+  const gainPct = totalVerse>0 ? (gain/totalVerse)*100 : 0;
+
+  let rendementAnnuel;
+  if(versementsExtra.length===0){
+    rendementAnnuel = dureeAns>0 ? (Math.pow(final/initial, 1/dureeAns)-1)*100 : 0;
+  } else {
+    const flows = [{amount:-initial, date:dateInit}];
+    versementsExtra.forEach(v=>{ if(v.date) flows.push({amount:-v.montant, date:v.date}); });
+    flows.push({amount:final, date:dateFinal});
+    flows.sort((a,b)=>new Date(a.date)-new Date(b.date));
+    rendementAnnuel = xirr(flows)*100;
+  }
+
+  document.getElementById('rz-out-cagr').innerHTML = pct(rendementAnnuel,2) + ' <small>/ an</small>';
+  document.getElementById('rz-out-cagr').className = 'headline ' + (rendementAnnuel>=0 ? '' : '');
+  document.getElementById('rz-out-gain').textContent = (gain>=0?'+':'') + eur(gain);
+  document.getElementById('rz-out-gain').className = gain>=0 ? 'positive' : 'negative';
+  document.getElementById('rz-out-gainpct').textContent = (gainPct>=0?'+':'') + pct(gainPct,1);
+  document.getElementById('rz-out-gainpct').className = gainPct>=0 ? 'positive' : 'negative';
+  document.getElementById('rz-out-duree').textContent = dureeAns.toFixed(1) + ' ans';
+}
+
+['rz-initial','rz-date-init','rz-final','rz-date-final'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', computeRentabilite);
+});
+
+// ---------- init ----------
+document.getElementById('rz-date-final').value = new Date().toISOString().slice(0,10);
+computeEpargne();
+computeRente();
+computeRevenus();
+computeRentabilite();
+</script>
+
+</body>
+</html>
