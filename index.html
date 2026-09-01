@@ -691,9 +691,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" onerror="window.__jspdfLoadFailed = true;"></script>
 <script>
 // ---------- Utils ----------
-const eur = (n) => n.toLocaleString('fr-FR', {style:'currency', currency:'EUR', maximumFractionDigits:0});
-const eurDec = (n) => n.toLocaleString('fr-FR', {style:'currency', currency:'EUR', maximumFractionDigits:2});
-const pct = (n, digits=2) => n.toLocaleString('fr-FR', {minimumFractionDigits:digits, maximumFractionDigits:digits}) + ' %';
+const eur = (n) => n.toLocaleString('fr-FR', {style:'currency', currency:'EUR', maximumFractionDigits:0}).replace(/[\u202F\u00A0]/g, ' ');
+const eurDec = (n) => n.toLocaleString('fr-FR', {style:'currency', currency:'EUR', maximumFractionDigits:2}).replace(/[\u202F\u00A0]/g, ' ');
+const pct = (n, digits=2) => n.toLocaleString('fr-FR', {minimumFractionDigits:digits, maximumFractionDigits:digits}).replace(/[\u202F\u00A0]/g, ' ') + ' %';
 
 // ---------- Tabs ----------
 document.querySelectorAll('nav.tabs button').forEach(btn=>{
@@ -1521,6 +1521,11 @@ function computeRentabilite(){
 });
 
 // ---------- init ----------
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
 document.getElementById('rz-date-final').value = new Date().toISOString().slice(0,10);
 computeEpargne();
 computeRente();
